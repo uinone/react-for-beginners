@@ -15,7 +15,7 @@
 1. key를 무시하지 말자.
 2. 아마존 밀림같았던 Select - Option
 
-### 1. key를 무시하지 말자.
+#### 1. key를 무시하지 말자.
 
 To Do 리스트를 러닝 리액트에서 본 느낌을 살려 만들던 중 이상한 일이 벌어졌습니다. 구조는 ToDoList 컴포넌트에 title과 id로 구성된 객체 배열을 넘기면, 이 배열을 참고하여 ToDo 컴포넌트들을 만들도록 했습니다.
 
@@ -59,7 +59,7 @@ function ToDo({ title, id, deleteTodo = (f) => f }) {
 
 이에 대해 탐구하는 과정은 추후 진행될 예정입니다.
 
-### 2. 아마존 밀림같았던 Select - Option.
+#### 2. 아마존 밀림같았던 Select - Option.
 
 coin tracker를 만들면서 약 6300개의 코인에 대한 정보를 배열 형태로 받게 되었습니다. 이 정보들을 Select의 Option들로 준 후, 선택된 option의 정보를 통해 N달러에 몇개의 코인을 살 수 있는지를 보이는 것이 목표였습니다.
 
@@ -97,3 +97,53 @@ const onSelect = (event) => {
   setMyCoin(0);
 };
 ```
+
+---
+
+`~21.12.05`
+
+1. exhaustive-deps-warning
+
+#### 1. exhaustive-deps-warning
+
+이름부터 무시무시합니다. 에러의 전문은 다음과 같습니다.
+
+> React Hook useEffect has a missing dependency: 'getMovie'. Either include it or remove the dependency array. (react-hooks/exhaustive-deps)
+
+처음 봤기 때문에 뭘 어떻게 하라는지 감도 안 잡혔습니다. 저 에러를 구글링 하고, 다음 [블로그](https://kyounghwan01.github.io/blog/React/exhaustive-deps-warning/#_1-useeffect%E1%84%82%E1%85%A2-state%E1%84%85%E1%85%B3%E1%86%AF-%E1%84%82%E1%85%A5%E1%87%82%E1%84%8B%E1%85%A5%E1%84%8C%E1%85%AE%E1%86%B7)를 통해 에러가 난 원인을 알 수 있었습니다.
+
+```js
+function Detail() {
+  const { id } = useParams();
+  const [movieData, setMovieData] = useState({});
+
+  const getMovie = async () => {
+    const json = await (
+      await fetch(`https://yts.mx/api/v2/movie_details.json?movie_id=${id}`)
+    ).json();
+    setMovieData(json.data.movie);
+  };
+
+  useEffect(() => {
+    getMovie();
+  }, []);
+
+  return <h1>Detail</h1>;
+}
+```
+
+위 코드에서 id라는 state를 useEffect 안에서 사용한 것이 문제였습니다.
+
+id가 바뀌게 되면 getMovie를 다시 렌더링 해야합니다. 이때 useEffect의 의존배열을 빈 배열로 설정했기 때문에 다시 렌더링을 할 수가 없습니다.
+
+```js
+useEffect(() => {
+  getMovie();
+}, [getMovie]);
+```
+
+그렇다고 위와같이 코드를 짜버리면 문제가 생깁니다. js에서 함수는 객체타입의 값입니다. 따라서 랜더링 할 때마다 메모리에 새로 값을 만들고 이를 식별자에 바인딩하게 됩니다.
+
+이를 리액트는 getMovie함수가 달라졌다고 판단합니다. 즉, id의 상태가 변하지 않아도 매 랜더링마다 getMovie를 호출하는 참사가 벌어집니다. 그래서 useCallBack 함수를 사용하여 id가 변할때만 getMovie를 호출하도록 처리해주면 해결됩니다.
+
+이런 참사를 미리 걱정해주는 [react-script](https://www.npmjs.com/package/react-scripts)에게 감사한 마음입니다.
