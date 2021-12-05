@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router";
+import { Link } from "react-router-dom";
 
 function Detail() {
   const { id } = useParams();
@@ -29,6 +30,27 @@ function Detail() {
         <h1>Loading</h1>
       ) : (
         <div style={{ display: "flex", marginTop: "50px" }}>
+          <Link to="/">
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                fontSize: "25px",
+                width: "40px",
+                height: "40px",
+                border: "2px solid black",
+                borderRadius: "50%",
+                backgroundColor: "skyblue",
+                position: "absolute",
+                top: 0,
+                left: "50%",
+                transform: "translateX(-84%) translateY(30%)",
+              }}
+            >
+              <span style={{ transform: "translateY(-18%)" }}>👈</span>
+            </div>
+          </Link>
           <div
             style={{
               display: "flex",
