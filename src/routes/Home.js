@@ -20,11 +20,25 @@ function Home() {
   }, []);
 
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: "50px",
+      }}
+    >
       {loading ? (
         <h1>Loading...</h1>
       ) : (
-        <div>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 600px)",
+            gridAutoRows: "400px",
+            gridGap: "50px",
+          }}
+        >
           {movies.map((movie) => (
             <Movie
               key={movie.id}

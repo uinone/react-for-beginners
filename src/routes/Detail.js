@@ -27,7 +27,7 @@ function Detail() {
       }}
     >
       {loading ? (
-        <h1>Loading</h1>
+        <h1>Loading...</h1>
       ) : (
         <div style={{ display: "flex", marginTop: "50px" }}>
           <Link to="/">
